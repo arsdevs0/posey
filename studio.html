@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f5f3ee">
+  <title>Still — Female pose editor</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="editor.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.min.js"></script>
+  <script defer src="studio.js"></script>
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="./" aria-label="Still home"><span class="brand-mark">s.</span>still<span class="brand-divider"></span><span class="brand-sub">POSE EDITOR</span></a><div class="header-right"><a class="gallery-link" href="gallery.html">2.5D references ↗</a><button id="reset" class="quiet-button">↺ <span>Restore scene</span></button></div></header>
+  <main>
+    <section class="intro"><div><div class="eyebrow">FEMALE MANNEQUIN / HANDS-ON POSING</div><h1>Touch a joint. <em>Make it your pose.</em></h1></div><p>Drag the handles directly in the camera frame.<br>Select a body part for precise adjustments.</p></section>
+    <nav id="pose-list" class="pose-list" aria-label="Choose a candid scene"></nav>
+    <section class="workspace" aria-label="Interactive candid studio">
+      <div class="setup-panel">
+        <div class="panel-heading"><div class="panel-name"><span class="live-dot"></span>THE SETUP<span class="subtle">Drag to look around</span></div><div class="view-toggle" aria-label="Setup viewpoint"><button id="orbit-view" aria-pressed="true">3D view</button><button id="top-view" aria-pressed="false">Top view</button></div></div>
+        <div id="stage-wrap" class="stage-wrap"><canvas id="stage" aria-label="3D room showing the subject, photographer and camera direction. Drag to orbit the room."></canvas><span id="subject-label" class="scene-label subject-label">01 <b>SUBJECT</b></span><span id="camera-label" class="scene-label camera-label">02 <b>PHOTOGRAPHER</b></span><div class="stage-caption"><span class="line-clay"></span> Subject <span class="line-green"></span> Camera + field of view</div><div class="plan-wrap"><div class="plan-title">POSITION MAP <span>drag dots</span></div><svg id="plan" viewBox="0 0 180 168" role="img" aria-label="Room plan. Drag the camera or subject markers; equivalent sliders are below."><rect x="9" y="9" width="162" height="148" rx="3" fill="#f5f3ee" stroke="#dad6cd"/><path d="M9 84H171M90 9V157" stroke="#e5e1d9" stroke-dasharray="3 4"/><path id="plan-cone" fill="#4b72682a" stroke="#4b726866"/><path id="plan-direction" stroke="#b87558" stroke-width="2"/><circle id="plan-subject" r="6" fill="#b87558" stroke="#fff" stroke-width="2"/><circle id="plan-camera" r="6" fill="#466e64" stroke="#fff" stroke-width="2"/><text x="16" y="25">BACK WALL</text></svg></div><div id="loading" class="loading">Setting the scene…</div></div>
+        <div class="scene-note"><span id="scene-number">01 / 05</span><div><h2 id="scene-title">Window-side pause</h2><p id="scene-cue">Cup haath mein rakho, weight ek pair par. Window ki taraf dekho.</p></div><span class="note-pill" id="scene-tag">STANDING</span></div>
+        <section class="rig-editor" aria-label="Body rig editor"><div class="rig-heading"><h3>Pose controls</h3><button id="reset-pose">Reset pose</button></div><label class="part-label" for="body-part">Body part<select id="body-part"></select></label><div id="rig-status" role="status" aria-live="polite">Choose a joint or drag a dot in the camera frame.</div><div class="rig-axis-grid"><label for="jointX"><span id="jointX-label">Left / right</span><output id="jointX-value"></output><input id="jointX" type="range" min="-1.5" max="1.5" step="0.01"></label><label for="jointY"><span id="jointY-label">Up / down</span><output id="jointY-value"></output><input id="jointY" type="range" min="0" max="2.3" step="0.01"></label><label for="jointZ"><span id="jointZ-label">Near / far</span><output id="jointZ-value"></output><input id="jointZ" type="range" min="-1.5" max="1.5" step="0.01"></label></div><div class="figure-controls"><div class="rig-heading"><h3>Female figure</h3><span>Shape</span></div><label for="bust">Bust <output id="bust-value">56</output><input type="range" id="bust" min="28" max="80" value="56"></label><label for="hips">Hips <output id="hips-value">56</output><input type="range" id="hips" min="28" max="80" value="56"></label><label for="left-curl">Left fingers <output id="left-curl-value">35%</output><input type="range" id="left-curl" min="0" max="100" value="35"></label><label for="right-curl">Right fingers <output id="right-curl-value">35%</output><input type="range" id="right-curl" min="0" max="100" value="35"></label></div></section>
+      </div>
+      <aside class="shot-panel"><div class="panel-heading"><div class="panel-name">THROUGH THE LENS</div><label class="rig-toggle"><input id="rig-toggle" type="checkbox" checked> Edit joints</label><span class="aspect">4 : 5</span></div><div class="shot-wrap"><canvas id="shot" aria-label="Live photo composition from the photographer's camera"></canvas><div id="rig-layer" aria-label="Draggable body joints"></div><div class="viewfinder-corner tl"></div><div class="viewfinder-corner tr"></div><div class="viewfinder-corner bl"></div><div class="viewfinder-corner br"></div><div class="thirds" id="thirds" hidden></div><span class="shot-caption" id="shot-caption">50 MM · EYE LEVEL</span></div><div class="shot-actions"><label><input id="grid-toggle" type="checkbox"> Thirds grid</label><span class="drag-hint">Drag a dot · Head / hands / feet: drag to rotate</span><button id="save" class="export-button">Save frame <span>↗</span></button></div><div class="tip"><span>THE LITTLE DIRECTION</span><p id="photo-tip">Catch the pause between sips. Leave a little room in the direction of the gaze.</p></div></aside>
+    </section>
+    <section class="controls" aria-label="Scene position and camera controls">
+      <div class="control-section"><div class="control-title"><span class="number-dot green">02</span><h3>Photographer position</h3><span class="control-unit">relative to subject</span></div><div class="control-grid">
+        <label class="slider-field" for="angle"><span>Camera angle <output id="angle-value">35°</output></span><input id="angle" type="range" min="-160" max="160" step="1" value="35"><span class="range-ends"><span>Left</span><span>Front</span><span>Right</span></span></label>
+        <label class="slider-field" for="distance"><span>Distance <output id="distance-value">3.4 m</output></span><input id="distance" type="range" min="1.5" max="4.8" step="0.05" value="3.4"><span class="range-ends"><span>Close</span><span>Wide</span></span></label>
+        <label class="slider-field" for="height"><span>Camera height <output id="height-value">1.45 m</output></span><input id="height" type="range" min="0.45" max="2.2" step="0.05" value="1.45"><span class="range-ends"><span>Low</span><span>High</span></span></label>
+        <label class="slider-field" for="lens"><span>Focal length <output id="lens-value">50 mm</output></span><input id="lens" type="range" min="24" max="85" step="1" value="50"><span class="range-ends"><span>24 mm</span><span>85 mm</span></span></label>
+      </div></div>
+      <div class="control-section subject-controls"><div class="control-title"><span class="number-dot clay">01</span><h3>Subject position</h3><span class="control-unit">moves person + supporting seat</span></div><div class="control-grid">
+        <label class="slider-field" for="subjectX"><span>Left / right <output id="subjectX-value">0.00 m</output></span><input id="subjectX" type="range" min="-0.8" max="0.8" step="0.05" value="0"><span class="range-ends"><span>Left</span><span>Right</span></span></label>
+        <label class="slider-field" for="subjectZ"><span>Forward / back <output id="subjectZ-value">0.00 m</output></span><input id="subjectZ" type="range" min="-0.8" max="0.8" step="0.05" value="0"><span class="range-ends"><span>Back</span><span>Forward</span></span></label>
+        <label class="slider-field" for="facing"><span>Body direction <output id="facing-value">−20°</output></span><input id="facing" type="range" min="-130" max="130" step="1" value="-20"><span class="range-ends"><span>Turn left</span><span>Turn right</span></span></label>
+        <label class="slider-field" for="target"><span>Aim height <output id="target-value">1.10 m</output></span><input id="target" type="range" min="0.35" max="1.65" step="0.05" value="1.1"><span class="range-ends"><span>Full body</span><span>Face</span></span></label>
+      </div></div>
+    </section>
+    <footer><span>STILL / STUDY 001—005</span><p>Original 3D scenes, built entirely in code. Positions in metres; camera uses a 36 × 45 mm virtual frame.</p><span>Make space for the moment.</span></footer>
+  </main>
+  <div id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
